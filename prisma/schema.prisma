@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Job {
+  id              Int               @id @default(autoincrement())
+  title           String
+  company         String?
+  location        String?
+  experienceLevel String?
+  salary          Float?
+  industry        Industry
+  skills          JobSkill[]
+  UserFavoriteJob UserFavoriteJob[]
+}
+
+model Skill {
+  id   Int        @id @default(autoincrement())
+  name String     @unique
+  jobs JobSkill[]
+}
+
+model JobSkill {
+  jobId   Int
+  skillId Int
+  job     Job   @relation(fields: [jobId], references: [id])
+  skill   Skill @relation(fields: [skillId], references: [id])
+
+  @@id([jobId, skillId])
+}
+
+enum Industry {
+  Software
+  Manufacturing
+  Marketing
+  Education
+  Retail
+  Healthcare
+  Finance
+}
+
+model User {
+  id        Int               @id @default(autoincrement())
+  email     String            @unique
+  name      String?
+  password  String
+  favorites UserFavoriteJob[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model UserFavoriteJob {
+  userId Int
+  jobId  Int
+  user   User @relation(fields: [userId], references: [id])
+  job    Job  @relation(fields: [jobId], references: [id])
+
+  @@id([userId, jobId])
+}
