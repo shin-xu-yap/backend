@@ -1,6 +1,6 @@
 import { GraphQLModule } from '@nestjs/graphql';
 import { Module } from '@nestjs/common';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+// import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { PrismaModule } from './prisma/prisma.module';
 import { JobModule } from './job/job.module';
 import { FavoriteJobModule } from './favorite-job/favorite-job.module';
@@ -10,11 +10,16 @@ import { FavoriteJobModule } from './favorite-job/favorite-job.module';
     PrismaModule,
     JobModule,
     FavoriteJobModule,
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      driver: ApolloDriver,
+    GraphQLModule.forRoot({
       autoSchemaFile: true,
       playground: true,
-      path: '/graphql',
+      cors: {
+        origin: [
+          'https://frontend-lilac-one-21.vercel.app',
+          'http://localhost:3000',
+        ],
+        credentials: true,
+      },
     }),
   ],
 })
