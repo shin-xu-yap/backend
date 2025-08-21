@@ -24,7 +24,7 @@ export class ElasticService {
 
   constructor() {
     if (
-      !process.env.ELASTICSEARCH_URL ||
+      !process.env.ELASTICSEARCH_CLOUD_ID ||
       !process.env.ELASTICSEARCH_USERNAME ||
       !process.env.ELASTICSEARCH_PASSWORD
     ) {
