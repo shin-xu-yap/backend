@@ -1,11 +1,17 @@
 import { Industry, PrismaClient } from '@prisma/client';
 import fs from 'fs';
 import path from 'path';
-import { parse } from 'csv-parse/sync';
+import { parse } from 'csv-parse';
 import { Client as ESClient } from '@elastic/elasticsearch';
 
 const prisma = new PrismaClient();
-const es = new ESClient({ node: 'http://localhost:9200' });
+const es = new ESClient({
+  cloud: { id: process.env.ELASTICSEARCH_CLOUD_ID! },
+  auth: {
+    username: process.env.ELASTICSEARCH_USERNAME!,
+    password: process.env.ELASTICSEARCH_PASSWORD!,
+  },
+});
 
 type JobRow = {
   'Job Title': string;
@@ -17,15 +23,26 @@ type JobRow = {
   'Required Skills': string;
 };
 
-function loadCSV(filePath: string): JobRow[] {
-  const file = fs.readFileSync(filePath, 'utf8');
-  return parse<JobRow>(file, {
-    columns: true,
-    skip_empty_lines: true,
-    trim: true,
-  });
+// --- Utility: batch processing ---
+async function batchCreate<T>(
+  data: T[],
+  fn: (batch: T[]) => Promise<any>,
+  batchSize = 500,
+) {
+  for (let i = 0; i < data.length; i += batchSize) {
+    const batch = data.slice(i, i + batchSize);
+    await fn(batch);
+  }
 }
 
+// --- Load CSV as a stream ---
+function streamCSV(filePath: string) {
+  return fs
+    .createReadStream(filePath)
+    .pipe(parse({ columns: true, skip_empty_lines: true, trim: true }));
+}
+
+// --- Create Elasticsearch index if missing ---
 async function createJobsIndex() {
   const exists = await es.indices.exists({ index: 'jobs' });
   if (!exists) {
@@ -54,27 +71,17 @@ async function createJobsIndex() {
   }
 }
 
+// --- Seed demo user ---
 async function seedDemoUser() {
   const demoEmail = 'demo@example.com';
-
-  // Check if the user already exists
   const existingUser = await prisma.user.findUnique({
     where: { email: demoEmail },
   });
-
-  if (existingUser) {
-    console.log('Demo user already exists:', existingUser.email);
-    return existingUser;
-  }
+  if (existingUser) return existingUser;
 
   const newUser = await prisma.user.create({
-    data: {
-      email: demoEmail,
-      name: 'Demo User',
-      password: 'password123',
-    },
+    data: { email: demoEmail, name: 'Demo User', password: 'password123' },
   });
-
   console.log('Demo user created:', newUser.email);
   return newUser;
 }
@@ -88,34 +95,49 @@ async function main() {
     'data',
     'job_recommendation_dataset.csv',
   );
-  const rows = loadCSV(filePath);
 
-  // --- Deduplicate and insert skills ---
-  const skillNames = Array.from(
-    new Set(
-      rows.flatMap((r) =>
-        r['Required Skills']
-          .split(',')
-          .map((s) => s.trim())
-          .filter(Boolean),
-      ),
-    ),
+  const skillSet = new Set<string>();
+  const jobMap = new Map<string, Omit<JobRow, 'Required Skills'>>();
+  const jobSkillLinks: { jobKey: string; skillName: string }[] = [];
+
+  const parser = streamCSV(filePath);
+
+  for await (const row of parser as AsyncIterable<JobRow>) {
+    // Collect unique skills
+    row['Required Skills']
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .forEach((skill) => skillSet.add(skill));
+
+    // Deduplicate jobs
+    const jobKey = `${row['Job Title']}-${row.Company}`;
+    if (!jobMap.has(jobKey)) jobMap.set(jobKey, row);
+
+    // Prepare job-skill links
+    row['Required Skills']
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .forEach((skillName) => {
+        jobSkillLinks.push({ jobKey, skillName });
+      });
+  }
+
+  // --- Insert skills ---
+  const skillNames = Array.from(skillSet);
+  await batchCreate(
+    skillNames.map((name) => ({ name })),
+    (batch) => prisma.skill.createMany({ data: batch, skipDuplicates: true }),
   );
-
-  await prisma.skill.createMany({
-    data: skillNames.map((name) => ({ name })),
-    skipDuplicates: true,
-  });
 
   const skills = await prisma.skill.findMany();
+  const skillMap = new Map(skills.map((s) => [s.name, s.id]));
 
-  // --- Deduplicate and insert jobs ---
-  const uniqueJobs = Array.from(
-    new Map(rows.map((r) => [`${r['Job Title']}-${r.Company}`, r])).values(),
-  );
-
-  await prisma.job.createMany({
-    data: uniqueJobs.map((j) => ({
+  // --- Insert jobs ---
+  const uniqueJobs = Array.from(jobMap.values());
+  await batchCreate(
+    uniqueJobs.map((j) => ({
       title: j['Job Title'],
       company: j.Company,
       location: j.Location,
@@ -123,61 +145,34 @@ async function main() {
       salary: Number(j.Salary) || 0,
       industry: j.Industry as Industry,
     })),
-    skipDuplicates: true,
-  });
+    (batch) => prisma.job.createMany({ data: batch, skipDuplicates: true }),
+  );
 
-  // --- Create job-skill links ---
   const jobs = await prisma.job.findMany();
-  const jobSkillLinks = Array.from(
-    new Set(
-      rows.flatMap((row) => {
-        const job = jobs.find(
-          (j) => j.title === row['Job Title'] && j.company === row.Company,
-        );
-        if (!job) return [];
-        return row['Required Skills']
-          .split(',')
-          .map((skillName) => {
-            const skill = skills.find((s) => s.name === skillName.trim());
-            if (!skill) return null;
-            return `${job.id}-${skill.id}`;
-          })
-          .filter(Boolean) as string[];
-      }),
-    ),
-  ).map((linkStr) => {
-    const [jobId, skillId] = linkStr.split('-').map(Number);
-    return { jobId, skillId };
-  });
+  const jobIdMap = new Map(jobs.map((j) => [`${j.title}-${j.company}`, j.id]));
 
-  await prisma.jobSkill.createMany({
-    data: jobSkillLinks,
-    skipDuplicates: true,
-  });
+  // --- Link job-skills ---
+  const jobSkillData = jobSkillLinks
+    .map((link) => {
+      const jobId = jobIdMap.get(link.jobKey);
+      const skillId = skillMap.get(link.skillName);
+      return jobId && skillId ? { jobId, skillId } : null;
+    })
+    .filter(Boolean) as { jobId: number; skillId: number }[];
 
-  // --- Reload jobs with skills after linking ---
-  const jobsWithSkills = await prisma.job.findMany({
-    include: {
-      skills: {
-        include: {
-          skill: true,
-        },
-      },
-    },
-  });
+  await batchCreate(jobSkillData, (batch) =>
+    prisma.jobSkill.createMany({ data: batch, skipDuplicates: true }),
+  );
 
-  // --- Elasticsearch indexing ---
+  // --- Elasticsearch indexing in batches ---
   await createJobsIndex();
 
-  const esBody = jobsWithSkills.flatMap((job) => {
-    const jobSkills = (job.skills || [])
-      .filter((js) => js.skill?.name) // only keep valid skills
-      .map((js) => ({
-        skillId: js.skill.id,
-        name: js.skill.name,
-      }));
+  const jobsWithSkills = await prisma.job.findMany({
+    include: { skills: { include: { skill: true } } },
+  });
 
-    return [
+  await batchCreate(jobsWithSkills, (batch) => {
+    const esBody = batch.flatMap((job) => [
       { index: { _index: 'jobs', _id: job.id } },
       {
         title: job.title,
@@ -186,15 +181,16 @@ async function main() {
         experienceLevel: job.experienceLevel,
         salary: job.salary,
         industry: job.industry,
-        skills: jobSkills,
+        skills: (job.skills || []).map((js) => ({
+          skillId: js.skill.id,
+          name: js.skill.name,
+        })),
       },
-    ];
+    ]);
+    return es.bulk({ refresh: true, body: esBody });
   });
 
-  if (esBody.length > 0) {
-    await es.bulk({ refresh: true, body: esBody });
-    console.log(`Indexed ${jobsWithSkills.length} jobs into Elasticsearch.`);
-  }
+  console.log('Seeding complete!');
 }
 
 void main()
