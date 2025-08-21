@@ -24,7 +24,7 @@ export class ElasticService {
   private client: Client;
 
   constructor() {
-    this.client = new Client({ node: 'http://localhost:9200' });
+    this.client = new Client({ node: process.env.ELASTICSEARCH_URL });
   }
 
   async searchJobs(
