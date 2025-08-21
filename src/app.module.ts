@@ -1,18 +1,20 @@
-import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
+import { Module } from '@nestjs/common';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { ElasticModule } from './elastic/elastic.module';
-import { JobResolver } from './job/job.resolver';
+import { PrismaModule } from './prisma/prisma.module';
+import { JobModule } from './job/job.module';
+import { FavoriteJobModule } from './favorite-job/favorite-job.module';
 
 @Module({
   imports: [
-    ElasticModule,
+    PrismaModule,
+    JobModule,
+    FavoriteJobModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: true,
       playground: true,
     }),
   ],
-  providers: [JobResolver],
 })
 export class AppModule {}
