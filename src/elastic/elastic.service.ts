@@ -39,8 +39,8 @@ export class ElasticService {
         username: process.env.ELASTICSEARCH_USERNAME,
         password: process.env.ELASTICSEARCH_PASSWORD,
       },
-      tls: {
-        rejectUnauthorized: false, // optional if Bonsai uses self-signed certs
+      headers: {
+        'Content-Type': 'application/json', // override default
       },
     });
   }
