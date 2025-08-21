@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
-
 import { Injectable } from '@nestjs/common';
-
 import { Client, estypes } from '@elastic/elasticsearch';
 
 export interface JobSkill {
@@ -36,17 +34,46 @@ export class ElasticService {
     }
 
     this.client = new Client({
-      cloud: {
-        id: process.env.ELASTICSEARCH_CLOUD_ID ?? '',
-      },
+      cloud: process.env.ELASTICSEARCH_CLOUD_ID
+        ? { id: process.env.ELASTICSEARCH_CLOUD_ID }
+        : undefined,
+      node: process.env.ELASTICSEARCH_URL,
       auth: {
         username: process.env.ELASTICSEARCH_USERNAME,
         password: process.env.ELASTICSEARCH_PASSWORD,
       },
-      node: process.env.ELASTICSEARCH_URL,
     });
   }
 
+  /** Ensure the 'jobs' index exists with proper mapping */
+  async createIndexIfNotExists(): Promise<void> {
+    const exists = await this.client.indices.exists({ index: 'jobs' });
+    if (!exists) {
+      await this.client.indices.create({
+        index: 'jobs',
+        mappings: {
+          properties: {
+            id: { type: 'integer' },
+            title: { type: 'text' },
+            company: { type: 'text' },
+            location: { type: 'text' },
+            experienceLevel: { type: 'keyword' },
+            salary: { type: 'integer' },
+            industry: { type: 'text' },
+            skills: {
+              type: 'nested',
+              properties: {
+                skillId: { type: 'integer' },
+                name: { type: 'text' },
+              },
+            },
+          },
+        },
+      });
+    }
+  }
+
+  /** Search jobs with optional query, filters, sorting, pagination */
   async searchJobs(
     query?: string,
     filters: estypes.QueryDslQueryContainer[] = [],
@@ -61,13 +88,11 @@ export class ElasticService {
               {
                 multi_match: {
                   query,
-
                   fields: ['title^2', 'company', 'location', 'industry'],
                 },
               },
             ]
           : [{ match_all: {} }],
-
         filter: filters,
       },
     };
@@ -80,25 +105,22 @@ export class ElasticService {
       ...(sort ? { sort: [sort] } : {}),
     };
 
-    const result = await this.client.search<JobDocument>(searchRequest);
+    // Explicitly type the result to fix TypeScript errors
+    const result = (await this.client.search<JobDocument>(
+      searchRequest,
+    )) as estypes.SearchResponse<JobDocument>;
 
     const jobs: JobDocument[] = result.hits.hits.map((hit) => {
       const source = hit._source!;
-
-      const jobId = Number.isInteger(source.id)
-        ? source.id
-        : Number(hit._id) || 0;
-
       const mappedSkills: JobSkill[] = (source.skills || [])
         .filter((skill) => skill?.name)
-
         .map((skill) => ({
           skillId: Number.isInteger(skill.skillId) ? skill.skillId : 0,
           name: skill.name!,
         }));
 
       return {
-        id: jobId,
+        id: Number.isInteger(source.id) ? source.id : Number(hit._id) || 0,
         title: source.title,
         company: source.company,
         location: source.location,
@@ -111,7 +133,6 @@ export class ElasticService {
 
     return {
       data: jobs,
-
       total:
         typeof result.hits.total === 'number'
           ? result.hits.total
@@ -119,18 +140,18 @@ export class ElasticService {
     };
   }
 
+  /** Index a single job document */
   async indexJob(job: JobDocument): Promise<void> {
     const { id, ...body } = job;
-
     await this.client.index({
       index: 'jobs',
       id: id.toString(),
       body,
     });
-
     await this.client.indices.refresh({ index: 'jobs' });
   }
 
+  /** Delete a job by ID */
   async deleteJob(id: number): Promise<void> {
     await this.client.delete({
       index: 'jobs',
