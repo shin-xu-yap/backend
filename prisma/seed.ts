@@ -31,21 +31,20 @@ async function createJobsIndex() {
   if (!exists) {
     await es.indices.create({
       index: 'jobs',
-      body: {
-        mappings: {
-          properties: {
-            title: { type: 'text' },
-            company: { type: 'text' },
-            location: { type: 'text' },
-            experienceLevel: { type: 'keyword' },
-            salary: { type: 'float' },
-            industry: { type: 'keyword' },
-            skills: {
-              type: 'nested',
-              properties: {
-                skillId: { type: 'integer' },
-                name: { type: 'keyword' },
-              },
+      mappings: {
+        properties: {
+          id: { type: 'integer' },
+          title: { type: 'text' },
+          company: { type: 'text' },
+          location: { type: 'text' },
+          experienceLevel: { type: 'keyword' },
+          salary: { type: 'integer' },
+          industry: { type: 'text' },
+          skills: {
+            type: 'nested',
+            properties: {
+              skillId: { type: 'integer' },
+              name: { type: 'text' },
             },
           },
         },
