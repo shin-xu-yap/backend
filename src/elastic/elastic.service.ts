@@ -1,130 +1,113 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
-import { Injectable } from '@nestjs/common';
-import { Client, estypes } from '@elastic/elasticsearch';
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { Client } from '@elastic/elasticsearch';
 
-export interface JobSkill {
-  skillId: number;
+interface Skill {
+  skillId: string;
   name: string;
 }
 
-export interface JobDocument {
-  id: number;
+interface JobSource {
   title: string;
   company: string;
   location: string;
+  skills: Skill[];
   experienceLevel: string;
-  salary: number;
+  salary: string;
   industry: string;
-  skills: JobSkill[];
 }
 
-@Injectable()
+interface JobDocument {
+  _id: string;
+  _source: JobSource;
+}
+
+interface SearchHits {
+  hits: JobDocument[];
+  total: { value: number; relation: string };
+}
+
+interface SearchResponse {
+  hits: SearchHits;
+}
+
 export class ElasticService {
   private client: Client;
 
   constructor() {
     if (
-      !process.env.ELASTICSEARCH_URL ||
-      !process.env.ELASTICSEARCH_USERNAME ||
-      !process.env.ELASTICSEARCH_PASSWORD
+      !process.env.ES_NODE ||
+      !process.env.ES_USERNAME ||
+      !process.env.ES_PASSWORD
     ) {
-      throw new Error(
-        'Elasticsearch credentials are missing in environment variables',
-      );
+      throw new Error('Elasticsearch environment variables are not set.');
     }
 
     this.client = new Client({
-      node: process.env.ELASTICSEARCH_URL,
+      node: process.env.ES_NODE,
       auth: {
-        username: process.env.ELASTICSEARCH_USERNAME,
-        password: process.env.ELASTICSEARCH_PASSWORD,
+        username: process.env.ES_USERNAME,
+        password: process.env.ES_PASSWORD,
       },
-      tls: { rejectUnauthorized: false },
+      ssl: {
+        rejectUnauthorized: false,
+      },
     });
   }
 
-  async searchJobs(
-    query?: string,
-    filters: estypes.QueryDslQueryContainer[] = [],
-    sort?: { [field: string]: 'asc' | 'desc' },
-    from = 0,
-    size = 10,
-  ): Promise<{ data: JobDocument[]; total: number }> {
-    const boolQuery: estypes.QueryDslQueryContainer = {
-      bool: {
-        must: query
-          ? [
-              {
-                multi_match: {
-                  query,
-                  fields: ['title^2', 'company', 'location', 'industry'],
-                },
-              },
-            ]
-          : [{ match_all: {} }],
-        filter: filters,
+  async searchJobs(index: string, query: object): Promise<JobSource[]> {
+    try {
+      const response = await this.client.search<SearchResponse>({
+        index,
+        body: query,
+      });
+
+      // access hits via response.body
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return response.body.hits.hits.map((hit) => hit._source);
+    } catch (error: unknown) {
+      console.error('Elasticsearch search error:', error);
+      return [];
+    }
+  }
+
+  async getAllJobs(): Promise<JobSource[]> {
+    return this.searchJobs('jobs', { query: { match_all: {} } });
+  }
+
+  async getJobsBySkill(skillName: string): Promise<JobSource[]> {
+    return this.searchJobs('jobs', {
+      query: {
+        nested: {
+          path: 'skills',
+          query: {
+            match: { 'skills.name': skillName },
+          },
+        },
       },
-    };
+    });
+  }
 
-    const searchRequest: estypes.SearchRequest = {
-      index: 'jobs',
-      from,
-      size,
-      query: boolQuery,
-      ...(sort ? { sort: [sort] } : {}),
-    };
+  async getJobsSortedBySalary(): Promise<JobSource[]> {
+    return this.searchJobs('jobs', {
+      query: { match_all: {} },
+      sort: [{ salary: { order: 'desc' } }],
+    });
+  }
 
-    const result = await this.client.search<JobDocument>(searchRequest);
-
-    const jobs: JobDocument[] = result.hits.hits.map((hit) => {
-      const source = hit._source!;
-      const jobId = Number.isInteger(source.id)
-        ? source.id
-        : Number(hit._id) || 0;
-      const mappedSkills: JobSkill[] = (source.skills || [])
-        .filter((skill) => skill?.name)
-        .map((skill) => ({
-          skillId: Number.isInteger(skill.skillId) ? skill.skillId : 0,
-          name: skill.name!,
-        }));
-
-      return {
+  async getJobById(jobId: string): Promise<JobSource | null> {
+    try {
+      const response = await this.client.get<JobDocument>({
+        index: 'jobs',
         id: jobId,
-        title: source.title,
-        company: source.company,
-        location: source.location,
-        experienceLevel: source.experienceLevel,
-        salary: source.salary,
-        industry: source.industry,
-        skills: mappedSkills,
-      };
-    });
+      });
 
-    return {
-      data: jobs,
-      total:
-        typeof result.hits.total === 'number'
-          ? result.hits.total
-          : (result.hits.total as estypes.SearchTotalHits).value,
-    };
-  }
-
-  async indexJob(job: JobDocument): Promise<void> {
-    const { id, ...body } = job;
-
-    await this.client.index({
-      index: 'jobs',
-      id: id.toString(),
-      body,
-    });
-
-    await this.client.indices.refresh({ index: 'jobs' });
-  }
-
-  async deleteJob(id: number): Promise<void> {
-    await this.client.delete({
-      index: 'jobs',
-      id: id.toString(),
-    });
+      // access _source via response.body
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return response.body._source ?? null;
+    } catch (error: unknown) {
+      console.error('Elasticsearch getById error:', error);
+      return null;
+    }
   }
 }
