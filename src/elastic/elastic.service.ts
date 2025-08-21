@@ -39,9 +39,6 @@ export class ElasticService {
         username: process.env.ELASTICSEARCH_USERNAME,
         password: process.env.ELASTICSEARCH_PASSWORD,
       },
-      headers: {
-        'Content-Type': 'application/json', // override default
-      },
       tls: { rejectUnauthorized: false },
     });
   }
