@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
-
 import { Injectable } from '@nestjs/common';
 import { Client, estypes } from '@elastic/elasticsearch';
 
@@ -24,8 +23,25 @@ export class ElasticService {
   private client: Client;
 
   constructor() {
+    if (
+      !process.env.ELASTICSEARCH_URL ||
+      !process.env.ELASTICSEARCH_USERNAME ||
+      !process.env.ELASTICSEARCH_PASSWORD
+    ) {
+      throw new Error(
+        'Elasticsearch credentials are missing in environment variables',
+      );
+    }
+
     this.client = new Client({
-      node: process.env.ELASTICSEARCH_URL || 'http://localhost:9200',
+      node: process.env.ELASTICSEARCH_URL,
+      auth: {
+        username: process.env.ELASTICSEARCH_USERNAME,
+        password: process.env.ELASTICSEARCH_PASSWORD,
+      },
+      tls: {
+        rejectUnauthorized: false, // optional if Bonsai uses self-signed certs
+      },
     });
   }
 
@@ -64,12 +80,9 @@ export class ElasticService {
 
     const jobs: JobDocument[] = result.hits.hits.map((hit) => {
       const source = hit._source!;
-
-      // extract id safely (fall back to _id if missing)
       const jobId = Number.isInteger(source.id)
         ? source.id
         : Number(hit._id) || 0;
-
       const mappedSkills: JobSkill[] = (source.skills || [])
         .filter((skill) => skill?.name)
         .map((skill) => ({
@@ -99,7 +112,6 @@ export class ElasticService {
   }
 
   async indexJob(job: JobDocument): Promise<void> {
-    // Extract id separately from the body
     const { id, ...body } = job;
 
     await this.client.index({
