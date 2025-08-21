@@ -42,6 +42,7 @@ export class ElasticService {
       headers: {
         'Content-Type': 'application/json', // override default
       },
+      tls: { rejectUnauthorized: false },
     });
   }
 
