@@ -1,49 +1,49 @@
-Job Title,Company,Location,Experience Level,Salary,Industry,Required Skills
-Early years teacher,Richardson Ltd,Sydney,Senior Level,87000.0,Healthcare,Pharmaceuticals
-Radio broadcast assistant,Franco Group,New York,Mid Level,77000.0,Healthcare,"Patient Care, Nursing, Medical Research, Pharmaceuticals"
-"Psychotherapist, dance movement",Barker Group,Sydney,Entry Level,112000.0,Healthcare,"Nursing, Medical Research, Pharmaceuticals"
-Academic librarian,Clark Ltd,London,Entry Level,104000.0,Healthcare,Pharmaceuticals
-Clinical research associate,"Johnson, Owens and Bowen",Toronto,Senior Level,121000.0,Retail,"Customer Service, Sales, Merchandising"
-Lexicographer,Kerr-Mcdowell,Sydney,Senior Level,87000.0,Healthcare,Pharmaceuticals
-"Scientist, research (life sciences)","Rose, Farmer and Holland",Toronto,Mid Level,77000.0,Healthcare,"Nursing, Patient Care, Medical Research, Pharmaceuticals"
-"Therapist, occupational","Hudson, Hubbard and Gonzales",Sydney,Senior Level,140000.0,Healthcare,Nursing
-Sales promotion account executive,Smith-Ramsey,San Francisco,Senior Level,113000.0,Healthcare,Pharmaceuticals
-"Psychologist, educational",Sherman Ltd,Toronto,Entry Level,121000.0,Retail,Customer Service
-"Designer, exhibition/display",Collins Inc,Berlin,Senior Level,90000.0,Software,Machine Learning
-Quantity surveyor,Dean-Delacruz,Sydney,Entry Level,123000.0,Software,"Java, Python"
-Fitness centre manager,Kent-Richardson,Bangalore,Senior Level,120000.0,Software,"Java, Python, C++"
-Product manager,Robinson PLC,Bangalore,Mid Level,100000.0,Software,"SQL, C++"
-Commissioning editor,"Adams, Carroll and Garcia",Sydney,Entry Level,125000.0,Marketing,"Google Ads, Social Media, Content Writing, SEO"
-Counselling psychologist,"Ramos, Santiago and Stewart",San Francisco,Mid Level,50000.0,Marketing,"Google Ads, SEO, Content Writing"
-Museum/gallery curator,Mendoza and Sons,Toronto,Mid Level, 7000.0, Marketing,"SEO, Social Media, Market Research"
-Writer,Mckinney-Martin,San Francisco,Senior Level,73000.0,Marketing,"Google Ads, Content Writing"
-Orthoptist,Jensen-Buchanan,Bangalore,Senior Level,110000.0,Marketing,"SEO, Google Ads"
-Nutritional therapist,"Walters, French and Shaw",San Francisco,Senior Level,106000.0,Marketing,"SEO, Google Ads, Market Research"
-Mining engineer,Berg LLC,London,Senior Level,67000.0,Manufacturing,Production Planning
-Accommodation manager,Phillips-Velasquez,London,Mid Level,103000.0,Manufacturing,"Supply Chain, Quality Control, Production Planning"
-"Accountant, chartered management","Jenkins, Sanchez and Wright",London,Mid Level,132000.0,Manufacturing,"Quality Control, Production Planning, Supply Chain"
-Cartographer,Adams-Hernandez,London,Senior Level,60000.0,Manufacturing,"Quality Control, Production Planning, Supply Chain"
-"Engineer, civil (consulting)",Hogan Inc,New York,Senior Level,147000.0,Manufacturing,"Quality Control, Supply Chain, Production Planning"
-"Programme researcher, broadcasting/film/video","Graham, Russell and Lowe",Toronto,Mid Level,133000.0,Manufacturing,"Supply Chain, Quality Control"
-"Designer, exhibition/display","Gonzales, Sanchez and Hill",Sydney,Entry Level,106000.0,Manufacturing,"Quality Control, Supply Chain"
-Proofreader,Livingston-Watson,Bangalore,Entry Level,138000.0,Manufacturing,"Quality Control, Supply Chain, Production Planning"
-Ergonomist,Lester-Lucas,Sydney,Mid Level,119000.0,Manufacturing,"Production Planning, Quality Control, Supply Chain"
-Musician,Thomas and Sons,Toronto,Mid Level,130000.0,Manufacturing,"Quality Control, Supply Chain, Production Planning"
-Research officer,government,Henderson and Sons,Sydney,Senior Level,112000.0,Manufacturing,"Production Planning, Quality Control"
-"Engineer, manufacturing systems",Spencer-Hernandez,Bangalore,Senior Level,133000.0,Healthcare,"Medical Research, Patient Care, Pharmaceuticals"
-Early years teacher,Dawson-Hudson,Sydney,Mid Level,93000.0,Finance,"Financial Modeling, Risk Analysis"
-Archaeologist,Williams LLC,New York,Senior Level,102000.0,Finance,"Python, SQL, Risk Analysis"
-Brewing technologist,Young-Cabrera,Sydney,Senior Level,83000.0,Finance,"Financial Modeling, SQL, Excel, Python"
-Race relations officer,Erickson-Ortiz,Sydney,Entry Level,49000.0,Finance,"SQL, Excel, Python"
-Education administrator,Gomez and Sons,San Francisco,Mid Level,85000.0,Finance,"Excel, Python, SQL"
-Sports coach,Ellis-Padilla,Berlin,Entry Level,121000.0,Finance,"SQL, Risk Analysis, Financial Modeling, Excel"
-Dietitian,Pena-Johnson,London,Mid Level,76000.0,Finance,"Risk Analysis, Financial Modeling, Python, Excel"
-Call centre manager,Koch-Francis,Bangalore,Mid Level,88000.0,Finance,Python
-"Designer, furniture",Waller-Smith,Sydney,Entry Level,139000.0,Retail,"Customer Service, Sales, Merchandising"
-Dealer,Valdez PLC,Bangalore,Mid Level,85000.0,Retail,"Customer Service, Sales, Merchandising"
-Chief Executive Officer,"Underwood, Bentley and Morris",Toronto,Senior Level,101000.0,Marketing,"Google Ads, Social Media, Market Research, SEO"
-Purchasing manager,Lang-Dixon,Sydney,Entry Level,66000.0,Retail,Customer Service
-Warehouse manager,Scott Group,San Francisco,Entry Level,59000.0,Retail,Sales
-"Buyer, retail",Cruz Inc,Sydney,Mid Level,51000.0,Retail,Customer Service
-Human resources officer,"Garcia, Faulkner and Scott",London,Senior Level,87000.0,Finance,"Excel, Risk Analysis"
-"Programme researcher, broadcasting/film/video","Graham, Russell and Lowe",Toronto,Mid Level,133000.0,Manufacturing,"Supply Chain, Quality Control"
+Job Title                                      , Company                        , Location          , Experience Level, Salary  , Industry     , Required Skills
+Early years teacher                            , Richardson Ltd                 , Sydney            , Senior Level    ,  87000.0, Healthcare   , Pharmaceuticals
+Radio broadcast assistant                      , Franco Group                   , New York          , Mid Level       ,  77000.0, Healthcare   , "Patient Care, Nursing, Medical Research, Pharmaceuticals"
+"Psychotherapist, dance movement"              , Barker Group                   , Sydney            , Entry Level     , 112000.0, Healthcare   , "Nursing, Medical Research, Pharmaceuticals"
+Academic librarian                             , Clark Ltd                      , London            , Entry Level     , 104000.0, Healthcare   , Pharmaceuticals
+Clinical research associate                    , "Johnson, Owens and Bowen"     , Toronto           , Senior Level    , 121000.0, Retail       , "Customer Service, Sales, Merchandising"
+Lexicographer                                  , Kerr-Mcdowell                  , Sydney            , Senior Level    ,  87000.0, Healthcare   , Pharmaceuticals
+"Scientist, research (life sciences)"          , "Rose, Farmer and Holland"     , Toronto           , Mid Level       ,  77000.0, Healthcare   , "Nursing, Patient Care, Medical Research, Pharmaceuticals"
+"Therapist, occupational"                      , "Hudson, Hubbard and Gonzales" , Sydney            , Senior Level    , 140000.0, Healthcare   , Nursing
+Sales promotion account executive              , Smith-Ramsey                   , San Francisco     , Senior Level    , 113000.0, Healthcare   , Pharmaceuticals
+"Psychologist, educational"                    , Sherman Ltd                    , Toronto           , Entry Level     , 121000.0, Retail       , Customer Service
+"Designer, exhibition/display"                 , Collins Inc                    , Berlin            , Senior Level    ,  90000.0, Software     , Machine Learning
+Quantity surveyor                              , Dean-Delacruz                  , Sydney            , Entry Level     , 123000.0, Software     , "Java, Python"
+Fitness centre manager                         , Kent-Richardson                , Bangalore         , Senior Level    , 120000.0, Software     , "Java, Python, C++"
+Product manager                                , Robinson PLC                   , Bangalore         , Mid Level       , 100000.0, Software     , "SQL, C++"
+Commissioning editor                           , "Adams, Carroll and Garcia"    , Sydney            , Entry Level     , 125000.0, Marketing    , "Google Ads, Social Media, Content Writing, SEO"
+Counselling psychologist                       , "Ramos, Santiago and Stewart"  , San Francisco     , Mid Level       ,  50000.0, Marketing    , "Google Ads, SEO, Content Writing"
+Museum/gallery curator                         , Mendoza and Sons               , Toronto           , Mid Level       ,   7000.0, Marketing    , "SEO, Social Media, Market Research"
+Writer                                         , Mckinney-Martin                , San Francisco     , Senior Level    ,  73000.0, Marketing    , "Google Ads, Content Writing"
+Orthoptist                                     , Jensen-Buchanan                , Bangalore         , Senior Level    , 110000.0, Marketing    , "SEO, Google Ads"
+Nutritional therapist                          , "Walters, French and Shaw"     , San Francisco     , Senior Level    , 106000.0, Marketing    , "SEO, Google Ads, Market Research"
+Mining engineer                                , Berg LLC                       , London            , Senior Level    ,  67000.0, Manufacturing, Production Planning
+Accommodation manager                          , Phillips-Velasquez             , London            , Mid Level       , 103000.0, Manufacturing, "Supply Chain, Quality Control, Production Planning"
+"Accountant, chartered management"             , "Jenkins, Sanchez and Wright"  , London            , Mid Level       , 132000.0, Manufacturing, "Quality Control, Production Planning, Supply Chain"
+Cartographer                                   , Adams-Hernandez                , London            , Senior Level    ,  60000.0, Manufacturing, "Quality Control, Production Planning, Supply Chain"
+"Engineer, civil (consulting)"                 , Hogan Inc                      , New York          , Senior Level    , 147000.0, Manufacturing, "Quality Control, Supply Chain, Production Planning"
+"Programme researcher, broadcasting/film/video", "Graham, Russell and Lowe"     , Toronto           , Mid Level       , 133000.0, Manufacturing, "Supply Chain, Quality Control"
+"Designer, exhibition/display"                 , "Gonzales, Sanchez and Hill"   , Sydney            , Entry Level     , 106000.0, Manufacturing, "Quality Control, Supply Chain"
+Proofreader                                    , Livingston-Watson              , Bangalore         , Entry Level     , 138000.0, Manufacturing, "Quality Control, Supply Chain, Production Planning"
+Ergonomist                                     , Lester-Lucas                   , Sydney            , Mid Level       , 119000.0, Manufacturing, "Production Planning, Quality Control, Supply Chain"
+Musician                                       , Thomas and Sons                , Toronto           , Mid Level       , 130000.0, Manufacturing, "Quality Control, Supply Chain, Production Planning"
+Research officer                               , government                     , Henderson and Sons, Senior Level    , 112000.0, Manufacturing, "Production Planning, Quality Control"
+"Engineer, manufacturing systems"              , Spencer-Hernandez              , Bangalore         , Senior Level    , 133000.0, Healthcare   , "Medical Research, Patient Care, Pharmaceuticals"
+Early years teacher                            , Dawson-Hudson                  , Sydney            , Mid Level       ,  93000.0, Finance      , "Financial Modeling, Risk Analysis"
+Archaeologist                                  , Williams LLC                   , New York          , Senior Level    , 102000.0, Finance      , "Python, SQL, Risk Analysis"
+Brewing technologist                           , Young-Cabrera                  , Sydney            , Senior Level    ,  83000.0, Finance      , "Financial Modeling, SQL, Excel, Python"
+Race relations officer                         , Erickson-Ortiz                 , Sydney            , Entry Level     ,  49000.0, Finance      , "SQL, Excel, Python"
+Education administrator                        , Gomez and Sons                 , San Francisco     , Mid Level       ,  85000.0, Finance      , "Excel, Python, SQL"
+Sports coach                                   , Ellis-Padilla                  , Berlin            , Entry Level     , 121000.0, Finance      , "SQL, Risk Analysis, Financial Modeling, Excel"
+Dietitian                                      , Pena-Johnson                   , London            , Mid Level       ,  76000.0, Finance      , "Risk Analysis, Financial Modeling, Python, Excel"
+Call centre manager                            , Koch-Francis                   , Bangalore         , Mid Level       ,  88000.0, Finance      , Python
+"Designer, furniture"                          , Waller-Smith                   , Sydney            , Entry Level     , 139000.0, Retail       , "Customer Service, Sales, Merchandising"
+Dealer                                         , Valdez PLC                     , Bangalore         , Mid Level       ,  85000.0, Retail       , "Customer Service, Sales, Merchandising"
+Chief Executive Officer                        , "Underwood, Bentley and Morris", Toronto           , Senior Level    , 101000.0, Marketing    , "Google Ads, Social Media, Market Research, SEO"
+Purchasing manager                             , Lang-Dixon                     , Sydney            , Entry Level     ,  66000.0, Retail       , Customer Service
+Warehouse manager                              , Scott Group                    , San Francisco     , Entry Level     ,  59000.0, Retail       , Sales
+"Buyer, retail"                                , Cruz Inc                       , Sydney            , Mid Level       ,  51000.0, Retail       , Customer Service
+Human resources officer                        , "Garcia, Faulkner and Scott"   , London            , Senior Level    ,  87000.0, Finance      , "Excel, Risk Analysis"
+"Programme researcher, broadcasting/film/video", "Graham, Russell and Lowe"     , Toronto           , Mid Level       , 133000.0, Manufacturing, "Supply Chain, Quality Control"
